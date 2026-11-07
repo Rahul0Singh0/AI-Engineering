@@ -72,3 +72,22 @@ print(path)
 
 # Escape Sequences
 print("Hello\nWorld")
+print("She said, \"Python is easy\"")
+print("C:\\Users\\Rahul")
+
+# \n > newline
+# \t > tab
+# \\ backslash
+# \" double quote
+# \' single quote
+
+# Python strings support unicode by default
+text = "Hello "
+print(text)
+print(ord("A"))
+print(chr(65))
+
+# Python string > bytes using UTF-8 encoding
+text = "Python" # normal string
+encoded = text.encode("utf-8")
+print(encoded) # Output b'Python' > the b before the python means this is a pyhton object, not a normal string
