@@ -1,25 +1,42 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
-from typing import Optional
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-print(os.getenv("TEST"))
+from typing import Optional, List
+from models import TodoModel
+from database import Sessionlocal, engine
+from sqlalchemy.orm import Session
 
 app = FastAPI() # Create an instance of FastAPI
 
-todos = [] # Create an empty list to store todos, in memory db
+TodoModel.metadata.create_all(bind=engine) # Create the table in the databse
 
-class Todo(BaseModel):
-    id: int
+class TodoBase(BaseModel):
     title: str
     description: Optional[str] = None
     completed: bool = False
 
-@app.get("/todos")
-def get_todos():
+class TodoCreate(TodoBase):
+    pass
+
+class TodoUpdate(TodoBase):
+    pass
+
+class TodoResponse(TodoBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+def get_db():
+    db = Sessionlocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@app.get("/todos", response_model=List[TodoModel])
+def get_todos(db: Session = Depends(get_db)):
+    todos = db.query(TodoModel).all()
     return todos
 
 @app.get("todos/{todo_id}")
